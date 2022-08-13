@@ -57,6 +57,5 @@ data:
       # when: app.status.operationState.phase in ['OutOfSync']
       when: app.status.sync.status == 'OutOfSync'
   subscriptions: |
-    - recipients:
-      - slack
-      triggers: [on-sync-succeeded, on-health-degraded, on-sync-degraded]
+    - recipients: [slack]
+      triggers: [on-health-degraded, on-sync-succeeded, on-sync-degraded]
