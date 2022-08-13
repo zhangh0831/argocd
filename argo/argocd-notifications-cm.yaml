@@ -49,7 +49,7 @@ data:
       when: app.status.health.status == 'Degraded'
   trigger.on-sync-succeeded: |
     - description: Application syncing has succeeded
-      send: [app-sync-status]  # template names
+      send: [app-sync-status]
       when: app.status.operationState.phase in ['Succeeded']
   trigger.on-sync-degraded: |
     - description: Application Out of sync
