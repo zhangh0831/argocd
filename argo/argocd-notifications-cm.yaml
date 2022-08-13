@@ -45,15 +45,15 @@ data:
   #   send: [app-sync-succeeded]
   trigger.on-health-degraded: |
     - description: Application has degraded
-      send: [app-sync-change]
+      send: [app-sync-status]
       when: app.status.health.status == 'Degraded'
   trigger.on-sync-succeeded: |
     - description: Application syncing has succeeded
-      send: [app-sync-change]  # template names
+      send: [app-sync-status]  # template names
       when: app.status.operationState.phase in ['Succeeded']
   trigger.on-sync-degraded: |
     - description: Application Out of sync
-      send: [app-sync-change]
+      send: [app-sync-status]
       # when: app.status.operationState.phase in ['OutOfSync']
       when: app.status.sync.status == 'OutOfSync'
   subscriptions: |
