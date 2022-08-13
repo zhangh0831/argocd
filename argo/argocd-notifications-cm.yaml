@@ -10,7 +10,7 @@ data:
       - name: Content-Type
         value: application/json
   context: |
-    argourl: htttp://192.168.10.140:31500/
+    argourl: http://192.168.10.140:31500/
   template.app-sync-status: |
     webhook: 
       slack:
