@@ -4,7 +4,7 @@ metadata:
   name: argocd-notifications-cm
   namespace: argocd
 data: 
-  service.slack: |
+  service.webhook.slack: |
     url: https://hooks.slack.com/services/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
     headers:
       - name: Content-Type
