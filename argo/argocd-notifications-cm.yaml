@@ -35,17 +35,28 @@ data:
              }]
            }]
          }
-  trigger.on-deployed: |
-    when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-    oncePer: app.status.sync.revision
-    send: [app-sync-succeeded]
+  # trigger.on-deployed: |
+  #   when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+  #   oncePer: app.status.sync.revision
+  #   send: [app-sync-succeeded]
+  # trigger.on-health-degraded: |
+  #   when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+  #   oncePer: app.status.sync.revision
+  #   send: [app-sync-succeeded]
   trigger.on-health-degraded: |
-    when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-    oncePer: app.status.sync.revision
-    send: [app-sync-succeeded]
+    - description: Application has degraded
+      send: [app-sync-change]
+      when: app.status.health.status == 'Degraded'
+  trigger.on-sync-succeeded: |
+    - description: Application syncing has succeeded
+      send: [app-sync-change]  # template names
+      when: app.status.operationState.phase in ['Succeeded']
+  trigger.on-sync-degraded: |
+    - description: Application Out of sync
+      send: [app-sync-change]
+      # when: app.status.operationState.phase in ['OutOfSync']
+      when: app.status.sync.status == 'OutOfSync'
   subscriptions: |
     - recipients:
       - slack
-      triggers:
-      - on-deployed
-      - on-health-degraded
+      triggers: [on-sync-succeeded, on-health-degraded, on-sync-degraded]
