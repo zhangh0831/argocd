@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argocd-notifications-cm
-  namespace: argo
+  namespace: argocd
 data: 
   service.slack: |
     url: https://hooks.slack.com/services/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
@@ -11,26 +11,30 @@ data:
         value: application/json
   context: |
     argourl: htttp://192.168.10.140:31500/
-template.app-sync-status: |
-  message: |
-    Application {{.app.metadata.name}} sync is {{.app.status.sync.status}}.
-    Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
-  slack:
-    attachments: |
-      [{
-        "title": "{{.app.metadata.name}}",
-        "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
-        "color": "#18be52",
-        "fields": [{
-          "title": "Sync Status",
-          "value": "{{.app.status.sync.status}}",
-          "short": true
-        }, {
-          "title": "Repository",
-          "value": "{{.app.spec.source.repoURL}}",
-          "short": true
-        }]
-      }]
+  template.app-sync-status: |
+    webhook: 
+      slack:
+        method: POST
+    # message: |
+    #   Application {{.app.metadata.name}} sync is {{.app.status.sync.status}}.
+    #   Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
+        body: |
+         {
+           "attachments": [{
+             "title": "{{.app.metadata.name}}",
+             "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+             "color": "#18be52",
+             "fields": [{
+               "title": "Sync Status",
+               "value": "{{.app.status.sync.status}}",
+               "short": true
+             }, {
+               "title": "Repository",
+               "value": "{{.app.spec.source.repoURL}}",
+               "short": true
+             }]
+           }]
+         }
   trigger.on-deployed: |
     when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
     oncePer: app.status.sync.revision
@@ -39,3 +43,9 @@ template.app-sync-status: |
     when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
     oncePer: app.status.sync.revision
     send: [app-sync-succeeded]
+  subscriptions: |
+    - recipients:
+      - slack
+      triggers:
+      - on-deployed
+      - on-health-degraded
