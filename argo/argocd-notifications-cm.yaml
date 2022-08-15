@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 data: 
   service.webhook.slack: |
-    url: https://hooks.slack.com/services/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
+    url: https://hooks.slack.com/services/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
     headers:
       - name: Content-Type
         value: application/json
