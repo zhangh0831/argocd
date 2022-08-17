@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 data: 
   service.webhook.slack: |
-    url: https://hooks.slack.com/services/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
+    url: https://hooks.slack.com/services/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
     headers:
       - name: Content-Type
         value: application/json
@@ -15,9 +15,6 @@ data:
     webhook: 
       slack:
         method: POST
-    # message: |
-    #   Application {{.app.metadata.name}} sync is {{.app.status.sync.status}}.
-    #   Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
         body: |
          {
            "attachments": [{
@@ -35,14 +32,6 @@ data:
              }]
            }]
          }
-  # trigger.on-deployed: |
-  #   when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-  #   oncePer: app.status.sync.revision
-  #   send: [app-sync-succeeded]
-  # trigger.on-health-degraded: |
-  #   when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-  #   oncePer: app.status.sync.revision
-  #   send: [app-sync-succeeded]
   trigger.on-health-degraded: |
     - description: Application has degraded
       send: [app-sync-status]
