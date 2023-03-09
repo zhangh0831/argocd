@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: nginx-argo
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      # volumes:
+      #   - name: nginx-conf
+      #     configMap:
+      #       name: nginx-conf
+      #   - name: confd-conf
+      #     configMap:
+      #       name: confd-conf
+      containers:
+      - name: nginx
+        image: nginx:1.15.10
+        ports:
+          - containerPort: 80
+            name: web
+            protocol: TCP
+        env:
+        - name: TZ
+          value: "Asia/Taipei"
+        resources:
+         requests:
+            cpu: 100m
+            memory: 32Mi
+         limits:
+            cpu: 150m
+            memory: 32Mi
+        # volumeMounts:
+        #     - name: nginx-conf
+        #       readOnly: true
+        #       mountPath: /etc/nginx/nginx.conf
+        #       subPath: nginx.conf
+        #     - name: confd-conf
+        #       readOnly: true
+        #       mountPath: /etc/nginx/conf.d/

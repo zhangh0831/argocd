@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  namespace: nginx-argo
+  labels:
+    service: nginx-svc
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: web
+  selector:
+    app: nginx
