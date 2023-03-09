@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  service.webhook.slack: |
+    url: https://hooks.slack.com/services/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
+    headers:
+      - name: Content-Type
+        value: application/json
+  context: |
+    argocdUrl: http://localhost:8080
+  template.app-sync-change: |
+    webhook:
+      slack:
+        method: POST
+        body: |
+          {
+            "attachments": [{
+              "title": "{{.app.metadata.name}}",
+              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#18be52",
+              "fields": [{
+                "title": "User",
+                "value": "{{ .app.status.operationState.operation.initiatedBy.username}}",
+                "short": true
+              }, {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }]
+            }]
+          }
+  template.app-sync-change-fail: |
+    webhook:
+      slack:
+        method: POST
+        body: |
+          {
+            "attachments": [{
+              "title": "{{.app.metadata.name}}",
+              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#18be52",
+              "fields": [{
+                "title": "Sync Status",
+                "value": "{{.app.status.operationState.phase}}",
+                "short": true
+              }, {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }, {
+                "title": "User",
+                "value": "{{ .app.status.operationState.operation.initiatedBy.username}}",
+                "short": true
+              }]
+            }]
+          }
+
+  trigger.sync-operation-change: |
+    - when: app.status.operationState.phase in ['Running']
+      send: [app-sync-change]
+    - when: app.status.health.status == 'Degraded'
+      send: [app-sync-change-fail]
+    - when: app.status.operationState.phase in ['Error', 'Failed']
+      send: [app-sync-change-fail]
+
+  subscriptions: |
+    - recipients: [slack]
+      triggers: [sync-operation-change]
